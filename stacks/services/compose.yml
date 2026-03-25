@@ -3,6 +3,8 @@ services:
   dns_server:
       image: ubuntu/bind9:latest
       container_name: dns_server
+      cap_add:
+        - NET_ADMIN
       environment:
       - BIND9_USER=root
       networks:
