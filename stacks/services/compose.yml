@@ -1,20 +1,37 @@
 
 services:  
   dns_server:
-      image: ubuntu/bind9:latest
-      container_name: dns_server
-      cap_add:
-        - NET_ADMIN
-      environment:
-      - BIND9_USER=root
-      networks:
-        services_net:
-          ipv4_address: 172.20.0.10
-      volumes:
-        - ./named.conf.local:/etc/bind/named.conf.local
-        - ./db.prod:/etc/bind/db.prod
-        - ./db.dev:/etc/bind/db.dev
-      restart: always
+    image: ubuntu/bind9:latest
+    container_name: dns_server
+    cap_add:
+      - NET_ADMIN
+    environment:
+    - BIND9_USER=root
+    networks:
+      services_net:
+        ipv4_address: 172.20.0.10
+    volumes:
+      - ./named.conf.local:/etc/bind/named.conf.local
+      - ./db.prod:/etc/bind/db.prod
+      - ./db.dev:/etc/bind/db.dev
+    restart: always
+  
+  nas_backups:
+    image: offen/docker-volume-backup:latest
+    container_name: nas_backups
+    networks:
+      services_net:
+        ipv4_address: 172.20.0.11
+      production_net:
+        ipv4_address: 172.30.0.11
+      development_net:
+        ipv4_address: 172.40.0.11
+    volumes:
+        - ./backups:/backups
+        - ./backup.conf:/etc/backup.conf
+    environment:
+      BACKUP_CRON_EXPRESSION=0 2 * * *
+    restart: always
 
 networks:
   services_net:

@@ -8,6 +8,9 @@
 # 1. Permitir tráfico de loopback
 -A INPUT -i lo -j ACCEPT
 
+# 1.1 Permitir DHCP cliente -> servidor (udp/68 -> udp/67)
+-A INPUT -p udp --sport 68 --dport 67 -j ACCEPT
+
 # 2. Permitir tráfico ya establecido
 -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT

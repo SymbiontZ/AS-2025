@@ -6,10 +6,7 @@ apt-get update && apt-get install -y iptables iproute2 dnsmasq
 sysctl -w net.ipv4.ip_forward=1
 
 # aplicar reglas
-iptables-restore < /iptables.rules
+sed 's/\r$//' /iptables.rules | iptables-restore
 
-# lanzar dnsmasq si lo usas
-# dnsmasq
-
-# mantener contenedor vivo
-tail -f /dev/null
+# lanzar dnsmasq en primer plano usando la config de DHCP
+exec dnsmasq -k --conf-file=/etc/dnsmasq.d/dhcp.conf
