@@ -16,6 +16,7 @@ services:
     volumes:
       - ./init.sh:/init.sh
       - ./iptables.rules:/iptables.rules
+      - ./dnsmasq.dhcp.conf:/etc/dnsmasq.d/dhcp.conf:ro
     command: bash /init.sh
 
 networks:

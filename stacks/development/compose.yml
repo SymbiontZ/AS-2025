@@ -3,7 +3,6 @@ services:
     image: mysql:8.0
     container_name: dev_mysql
     restart: unless-stopped
-    mac_address: "02:42:ac:28:00:02"
     env_file:
       - .env
     environment:

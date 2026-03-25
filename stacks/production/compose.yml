@@ -3,7 +3,6 @@
       image: postgres:16
       container_name: prod_postgres
       restart: unless-stopped
-      mac_address: "02:42:ac:28:00:02"
       env_file:
         - .env
       environment:
