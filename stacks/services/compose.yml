@@ -17,7 +17,9 @@ services:
     restart: always
   
   nas_backups:
-    image: offen/docker-volume-backup:latest
+    build:
+      context: ../../
+      dockerfile: stacks/services/Dockerfile
     container_name: nas_backups
     networks:
       services_net:
@@ -28,9 +30,6 @@ services:
         ipv4_address: 172.40.0.11
     volumes:
         - ./backups:/backups
-        - ./backup.conf:/etc/backup.conf
-    environment:
-      BACKUP_CRON_EXPRESSION=0 2 * * *
     restart: always
 
 networks:
