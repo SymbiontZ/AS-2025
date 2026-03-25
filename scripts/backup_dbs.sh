@@ -10,11 +10,11 @@ LOG_FILE="$BACKUP_DEST_DIR/backup.log"
 STATUS_LOG="/var/log/backup_status.log"
 
 # IPs Base de datos
-PG_HOST="172.20.0.30"
+PG_HOST="172.20.0.21"
 PG_USER="postgres"
 PG_DB="postgres"
 
-MY_HOST="172.20.0.40"
+MY_HOST="172.20.0.20"
 MY_USER="root"
 
 # Existen los directorios
