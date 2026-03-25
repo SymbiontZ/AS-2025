@@ -1,20 +1,28 @@
 *filter
 
+# Política por defecto: Bloquear todo lo que entra y lo que pasa a través del firewall
 :INPUT DROP [0:0]
 :FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 
-# permitir tráfico ya establecido
--A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+# 1. Permitir tráfico de loopback
+-A INPUT -i lo -j ACCEPT
 
-# permitir redes internas
--A FORWARD -s 172.10.0.0/16 -j ACCEPT
--A FORWARD -s 172.20.0.0/16 -j ACCEPT
--A FORWARD -s 172.30.0.0/16 -j ACCEPT
--A FORWARD -s 172.40.0.0/16 -j ACCEPT
+# 2. Permitir tráfico ya establecido
+-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-# bloquear producción -> desarrollo
--A FORWARD -s 172.30.0.0/16 -d 172.40.0.0/16 -j DROP
+# 3. REGLA: Services <-> Development: PERMITIDO
+-A FORWARD -s 172.20.0.0/24 -d 172.40.0.0/24 -j ACCEPT
+-A FORWARD -s 172.40.0.0/24 -d 172.20.0.0/24 -j ACCEPT
+
+# 4. REGLA: Excepción Backups BBDD
+-A FORWARD -s 172.30.0.0/24 -d 172.20.0.0/24 -j DROP
+-A FORWARD -s 172.20.0.0/24 -d 172.30.0.0/24 -j DROP
+
+# 5. REGLA: Acceso desde la VPN
+-A FORWARD -s 172.10.0.0/24 -j ACCEPT
+
 
 COMMIT
 
@@ -24,7 +32,8 @@ COMMIT
 :POSTROUTING ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
 
-# NAT (ajusta interfaz)
--A POSTROUTING -o eth0 -j MASQUERADE
+# NAT: Enmascaramiento para que el tráfico entre subredes Docker funcione 
+# sin necesidad de configurar rutas estáticas en cada contenedor.
+-A POSTROUTING -j MASQUERADE
 
 COMMIT
