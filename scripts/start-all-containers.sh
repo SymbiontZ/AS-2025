@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() { printf '%s\n' "$*" >&2; }
+die() { log "ERROR: $*"; exit 1; }
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || die "No se encontro el comando requerido: $1"
+}
+
+require_cmd docker
+
+# En Linux moderno, 'docker compose' viene como plugin.
+docker compose version >/dev/null 2>&1 || die "No se pudo ejecutar 'docker compose'."
+
+create_networks_if_needed() {
+  local script="$ROOT_DIR/scripts/create-docker-networks.sh"
+  if [[ -x "$script" ]]; then
+    log "==> Verificando/creando redes Docker"
+    "$script"
+    return
+  fi
+
+  if [[ -f "$script" ]]; then
+    log "==> Verificando/creando redes Docker"
+    bash "$script"
+    return
+  fi
+
+  die "No se encontro $script"
+}
+
+up_stack() {
+  local compose_file="$1"
+  [[ -f "$compose_file" ]] || die "No existe compose: $compose_file"
+
+  log "==> Levantando $(basename "$(dirname "$compose_file")")"
+  docker compose -f "$compose_file" up -d
+}
+
+main() {
+  create_networks_if_needed
+
+  # Orden recomendado: primero firewall/router y luego servicios.
+  up_stack "$ROOT_DIR/stacks/network/compose.yml"
+  up_stack "$ROOT_DIR/stacks/services/compose.yml"
+  up_stack "$ROOT_DIR/stacks/development/compose.yml"
+  up_stack "$ROOT_DIR/stacks/production/compose.yml"
+  up_stack "$ROOT_DIR/stacks/vpn/compose.yml"
+
+  log ""
+  log "Listo. Estado de contenedores:"
+  docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Networks}}"
+}
+
+main "$@"

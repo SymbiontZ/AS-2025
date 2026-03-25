@@ -30,7 +30,7 @@ services:
         - ./backups:/backups
         - ./backup.conf:/etc/backup.conf
     environment:
-      BACKUP_CRON_EXPRESSION=0 2 * * *
+      - BACKUP_CRON_EXPRESSION=0 2 * * *
     restart: always
 
 networks:
