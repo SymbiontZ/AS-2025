@@ -10,12 +10,12 @@ LOG_FILE="$BACKUP_DEST_DIR/backup.log"
 STATUS_LOG="/var/log/backup_status.log"
 
 # IPs Base de datos
-PG_HOST="172.20.0.21"
-PG_USER="postgres"
-PG_DB="postgres"
+PG_HOST="${PG_HOST:-172.20.0.21}"
+PG_USER="${PG_USER:-${POSTGRES_USER:-as2025}}"
+PG_DB="${PG_DB:-${POSTGRES_DATABASE:-as2025}}"
 
-MY_HOST="172.20.0.20"
-MY_USER="root"
+MY_HOST="${MY_HOST:-172.20.0.20}"
+MY_USER="${MY_USER:-${MYSQL_USER:-as2025}}"
 
 # Existen los directorios
 mkdir -p "$BACKUP_DEST_DIR"
@@ -23,11 +23,33 @@ mkdir -p "$TMP_DUMP_DIR"
 
 echo "[$TIMESTAMP] START: Database backups" >> "$LOG_FILE"
 
+# Credenciales: preferimos variables ya exportadas y hacemos fallback a variables de compose
+if [ -z "${PGPASSWORD:-}" ]; then
+    if [ -n "${POSTGRES_PASSWORD:-}" ]; then
+        export PGPASSWORD="$POSTGRES_PASSWORD"
+    else
+        echo "[$TIMESTAMP] ERROR: PGPASSWORD/POSTGRES_PASSWORD no definida." >> "$LOG_FILE"
+        echo "[$TIMESTAMP] FAILED - Missing PostgreSQL password env var." >> "$STATUS_LOG"
+        exit 1
+    fi
+fi
+
+if [ -z "${MYSQL_PWD:-}" ]; then
+    if [ -n "${MYSQL_ROOT_PASSWORD:-}" ]; then
+        export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"
+    elif [ -n "${MYSQL_PASSWORD:-}" ] && [ "$MY_USER" != "root" ]; then
+        export MYSQL_PWD="$MYSQL_PASSWORD"
+    else
+        echo "[$TIMESTAMP] ERROR: MYSQL_PWD/MYSQL_ROOT_PASSWORD no definida para usuario $MY_USER." >> "$LOG_FILE"
+        echo "[$TIMESTAMP] FAILED - Missing MySQL password env var." >> "$STATUS_LOG"
+        exit 1
+    fi
+fi
+
 # 1. PostgreSQL Backup
 PG_FILE="$TMP_DUMP_DIR/pg_backup_$TIMESTAMP.sql"
 echo "[$TIMESTAMP] Running pg_dump..." >> "$LOG_FILE"
-# Contraseñas en el .env
-PGPASSWORD="${PGPASSWORD:-your_pg_password}" pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$PG_DB" > "$PG_FILE"
+pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$PG_DB" > "$PG_FILE"
 if [ $? -eq 0 ]; then
     echo "[$TIMESTAMP] SUCCESS: PostgreSQL backup completed." >> "$LOG_FILE"
 else
@@ -37,8 +59,7 @@ fi
 # 2. MySQL Backup
 MY_FILE="$TMP_DUMP_DIR/mysql_backup_$TIMESTAMP.sql"
 echo "[$TIMESTAMP] Running mysqldump..." >> "$LOG_FILE"
-# Contraseñas en el .env
-MYSQL_PWD="${MYSQL_PWD:-your_mysql_password}" mysqldump -h "$MY_HOST" -u "$MY_USER" --all-databases > "$MY_FILE"
+mysqldump -h "$MY_HOST" -u "$MY_USER" --all-databases > "$MY_FILE"
 if [ $? -eq 0 ]; then
     echo "[$TIMESTAMP] SUCCESS: MySQL backup completed." >> "$LOG_FILE"
 else
