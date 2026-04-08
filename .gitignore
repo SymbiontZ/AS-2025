@@ -3,3 +3,10 @@
 
 # Docker volumes (por si los mapeas a carpetas locales)
 **/*mysql*data*/
+
+
+# Logs y dumps locales (si los guardas en tu máquina)
+**/logs/*
+**/dumps/*
+
+**/backups/*
