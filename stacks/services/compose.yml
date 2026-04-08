@@ -32,7 +32,6 @@ services:
         - ./backup.conf:/etc/backup.conf
     environment:
       - BACKUP_CRON_EXPRESSION=0 2 * * *
-      - MY_USER=${MYSQL_USER:-as2025}
     restart: always
 
 networks:

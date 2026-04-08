@@ -35,10 +35,13 @@ if [ -z "${PGPASSWORD:-}" ]; then
 fi
 
 if [ -z "${MYSQL_PWD:-}" ]; then
-    if [ -n "${MYSQL_ROOT_PASSWORD:-}" ]; then
+    if [ "$MY_USER" = "root" ] && [ -n "${MYSQL_ROOT_PASSWORD:-}" ]; then
         export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"
-    elif [ -n "${MYSQL_PASSWORD:-}" ] && [ "$MY_USER" != "root" ]; then
+    elif [ "$MY_USER" != "root" ] && [ -n "${MYSQL_PASSWORD:-}" ]; then
         export MYSQL_PWD="$MYSQL_PASSWORD"
+    elif [ -n "${MYSQL_ROOT_PASSWORD:-}" ]; then
+        # Last resort when only root password is available in environment.
+        export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"
     else
         echo "[$TIMESTAMP] ERROR: MYSQL_PWD/MYSQL_ROOT_PASSWORD no definida para usuario $MY_USER." >> "$LOG_FILE"
         echo "[$TIMESTAMP] FAILED - Missing MySQL password env var." >> "$STATUS_LOG"
@@ -59,7 +62,7 @@ fi
 # 2. MySQL Backup
 MY_FILE="$TMP_DUMP_DIR/mysql_backup_$TIMESTAMP.sql"
 echo "[$TIMESTAMP] Running mysqldump..." >> "$LOG_FILE"
-mysqldump -h "$MY_HOST" -u "$MY_USER" --all-databases > "$MY_FILE"
+mysqldump -h "$MY_HOST" -u "$MY_USER" --all-databases --no-tablespaces > "$MY_FILE"
 if [ $? -eq 0 ]; then
     echo "[$TIMESTAMP] SUCCESS: MySQL backup completed." >> "$LOG_FILE"
 else
