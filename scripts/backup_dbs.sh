@@ -24,6 +24,18 @@ mkdir -p "$TMP_DUMP_DIR"
 
 echo "[$TIMESTAMP] START: Database backups" >> "$LOG_FILE"
 
+# Cron can run with a stripped environment. If key vars are missing,
+# import the container runtime environment from PID 1.
+if [ -z "${POSTGRES_PASSWORD:-}" ] || [ -z "${MYSQL_PASSWORD:-}" ]; then
+    if [ -r /proc/1/environ ]; then
+        while IFS= read -r -d '' kv; do
+            case "$kv" in
+                *=*) export "$kv" ;;
+            esac
+        done < /proc/1/environ
+    fi
+fi
+
 # Credenciales: preferimos variables ya exportadas y hacemos fallback a variables de compose
 if [ -z "${PGPASSWORD:-}" ]; then
     if [ -n "${POSTGRES_PASSWORD:-}" ]; then

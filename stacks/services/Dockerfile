@@ -18,7 +18,8 @@ COPY scripts/backup_dbs.sh /usr/local/bin/backup_dbs.sh
 COPY stacks/services/crontab /etc/cron.d/backup-cron
 
 # Normalize line endings in case files were edited on Windows (CRLF -> LF)
-RUN sed -i 's/\r$//' /usr/local/bin/backup_dbs.sh /etc/cron.d/backup-cron
+RUN sed -i 's/\r$//' /usr/local/bin/backup_dbs.sh /etc/cron.d/backup-cron && \
+    printf '\n' >> /etc/cron.d/backup-cron
 
 # Apply execution permissions and register the crontab
 RUN chmod +x /usr/local/bin/backup_dbs.sh && \
