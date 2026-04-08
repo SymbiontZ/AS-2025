@@ -16,6 +16,7 @@ PG_DB="${PG_DB:-${POSTGRES_DATABASE:-as2025}}"
 
 MY_HOST="${MY_HOST:-172.20.0.20}"
 MY_USER="${MY_USER:-${MYSQL_USER:-as2025}}"
+MY_DB="${MY_DB:-${MYSQL_DATABASE:-as2025}}"
 
 # Existen los directorios
 mkdir -p "$BACKUP_DEST_DIR"
@@ -62,7 +63,7 @@ fi
 # 2. MySQL Backup
 MY_FILE="$TMP_DUMP_DIR/mysql_backup_$TIMESTAMP.sql"
 echo "[$TIMESTAMP] Running mysqldump..." >> "$LOG_FILE"
-mysqldump -h "$MY_HOST" -u "$MY_USER" --all-databases --no-tablespaces > "$MY_FILE"
+mysqldump -h "$MY_HOST" -u "$MY_USER" --databases "$MY_DB" --no-tablespaces > "$MY_FILE"
 if [ $? -eq 0 ]; then
     echo "[$TIMESTAMP] SUCCESS: MySQL backup completed." >> "$LOG_FILE"
 else
