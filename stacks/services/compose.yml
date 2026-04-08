@@ -21,6 +21,9 @@ services:
       context: ../../
       dockerfile: stacks/services/Dockerfile
     container_name: nas_backups
+    env_file:
+      - ../development/.env
+      - ../production/.env
     networks:
       services_net:
         ipv4_address: 172.20.0.11

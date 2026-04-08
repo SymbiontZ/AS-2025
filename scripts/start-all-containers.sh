@@ -36,6 +36,11 @@ up_stack() {
   local compose_file="$1"
   [[ -f "$compose_file" ]] || die "No existe compose: $compose_file"
 
+  if ! docker compose -f "$compose_file" config >/dev/null 2>&1; then
+    log "==> WARN: compose invalido o vacio en $(basename "$(dirname "$compose_file")"), se omite"
+    return 0
+  fi
+
   log "==> Levantando $(basename "$(dirname "$compose_file")")"
   docker compose -f "$compose_file" up -d
 }
