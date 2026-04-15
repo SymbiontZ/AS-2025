@@ -34,6 +34,18 @@ services:
       - BACKUP_CRON_EXPRESSION=0 2 * * *
     restart: always
 
+  ssh_manager:
+    build:
+      context: ./ssh
+      dockerfile: Dockerfile
+    container_name: ssh_manager
+    networks:
+      services_net:
+        ipv4_address: 172.20.0.12
+    volumes:
+      - ./ssh/authorized_keys:/home/admin_user/.ssh/authorized_keys:ro
+    restart: always
+
 networks:
   services_net:
     external: true
