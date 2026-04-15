@@ -1,5 +1,4 @@
-
-services:  
+services:
   dns_server:
     image: ubuntu/bind9:latest
     container_name: dns_server
@@ -9,7 +8,7 @@ services:
       - "1053:53/udp"
       - "1053:53/tcp"
     environment:
-    - BIND9_USER=root
+      - BIND9_USER=root
     networks:
       services_net:
         ipv4_address: 172.20.0.10
@@ -20,7 +19,7 @@ services:
       - ./db.172.30:/etc/bind/zones/db.172.30
       - ./db.172.40:/etc/bind/zones/db.172.40
     restart: always
-  
+
   nas_backups:
     build:
       context: ../../
@@ -33,8 +32,8 @@ services:
       services_net:
         ipv4_address: 172.20.0.11
     volumes:
-        - ./backups:/backups
-        - ./backup.conf:/etc/backup.conf
+      - ./backups:/backups
+      - ./backup.conf:/etc/backup.conf
     environment:
       - BACKUP_CRON_EXPRESSION=0 2 * * *
     restart: always
