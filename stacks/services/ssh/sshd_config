@@ -6,8 +6,9 @@ HostKey /etc/ssh/ssh_host_ed25519_key
 
 # Authentication
 PermitRootLogin no
-StrictModes no
+StrictModes yes
 PubkeyAuthentication yes
+AuthorizedKeysFile /etc/ssh/admin_keys
 PasswordAuthentication no
 PermitEmptyPasswords no
 ChallengeResponseAuthentication no
