@@ -12,8 +12,10 @@ RUN apt-get update && \
 # Create privilege separation directory
 RUN mkdir -p /run/sshd
 
-# Ensure the admin user exists
-RUN useradd -rm -d /home/admin_user -s /bin/bash -g root -G sudo -u 1000 admin_user
+# Ensure the admin user exists, unlock the account so SSH doesn't reject it, and enable passwordless sudo
+RUN useradd -rm -d /home/admin_user -s /bin/bash -g root -G sudo -u 1000 admin_user && \
+    passwd -d admin_user && \
+    echo "admin_user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Create .ssh directory and ensure correct permissions
 RUN mkdir -p /home/admin_user/.ssh && \
