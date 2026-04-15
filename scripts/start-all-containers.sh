@@ -52,6 +52,14 @@ up_stack() {
   docker compose -f "$compose_file" up -d
 }
 
+is_container_running() {
+  local container_name="$1"
+  local state
+
+  state="$(docker inspect -f '{{.State.Status}}' "$container_name" 2>/dev/null || true)"
+  [[ "$state" == "running" ]]
+}
+
 main() {
   create_networks_if_needed
 
@@ -60,7 +68,12 @@ main() {
   up_stack "$ROOT_DIR/stacks/services/compose.yml"
   up_stack "$ROOT_DIR/stacks/development/compose.yml"
   up_stack "$ROOT_DIR/stacks/production/compose.yml"
-  up_stack "$ROOT_DIR/stacks/vpn/compose.yml"
+
+  if is_container_running "pfsense-fw"; then
+    up_stack "$ROOT_DIR/stacks/vpn/compose.yml"
+  else
+    log "==> WARN: pfsense-fw no esta en estado running; se omite stack vpn"
+  fi
 
   log ""
   log "Listo. Estado de contenedores:"

@@ -4,22 +4,46 @@ services:
     container_name: vpn_server
     cap_add:
       - NET_ADMIN
+      - SYS_MODULE
     networks:
       vpn_net:
         ipv4_address: 172.10.0.10
+      services_net:
+        ipv4_address: 172.20.0.3
+      production_net:
+        ipv4_address: 172.30.0.3
+      development_net:
+        ipv4_address: 172.40.0.3
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    env_file:
+      - .env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-      # Aquí se configurarían las variables de peers/usuarios
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+      - SERVERURL=${SERVERURL:-vpn.empresa.local}
+      - SERVERPORT=${SERVERPORT:-51820}
+      - PEERS=${PEERS:-2}
+      - PEERDNS=${PEERDNS:-172.20.0.10}
+      - INTERNAL_SUBNET=${INTERNAL_SUBNET:-10.13.13.0}
+      - ALLOWEDIPS=${ALLOWEDIPS:-172.10.0.0/24,172.20.0.0/24,172.30.0.0/24,172.40.0.0/24}
+      - PERSISTENTKEEPALIVE_PEERS=${PERSISTENTKEEPALIVE_PEERS:-all}
+      - LOG_CONFS=${LOG_CONFS:-true}
     volumes:
       - ./vpn-config:/config
+      - /lib/modules:/lib/modules:ro
     ports:
       - "51820:51820/udp" # Puerto expuesto al host para clientes externos
     restart: unless-stopped
-    depends_on:
-      - pfsense-fw
 
 networks:
   vpn_net:
+    external: true
+  services_net:
+    external: true
+  production_net:
+    external: true
+  development_net:
     external: true

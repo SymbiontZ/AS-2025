@@ -1,5 +1,6 @@
 # Env files (no commitear secretos)
 **/.env
+!**/.env.example
 
 # Docker volumes (por si los mapeas a carpetas locales)
 **/*mysql*data*/
@@ -10,3 +11,12 @@
 **/dumps/*
 
 **/backups/*
+
+# WireGuard/VPN generated state and secrets
+stacks/vpn/vpn-config/.donoteditthisfile
+stacks/vpn/vpn-config/server/
+stacks/vpn/vpn-config/wg_confs/
+stacks/vpn/vpn-config/peer*/
+stacks/vpn/vpn-config/profiles/*.conf
+stacks/vpn/vpn-config/**/*.png
+stacks/vpn/vpn-config/coredns/
