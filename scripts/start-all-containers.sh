@@ -34,14 +34,21 @@ create_networks_if_needed() {
 
 up_stack() {
   local compose_file="$1"
+  local stack_name
+  local config_output
+  stack_name="$(basename "$(dirname "$compose_file")")"
   [[ -f "$compose_file" ]] || die "No existe compose: $compose_file"
 
-  if ! docker compose -f "$compose_file" config >/dev/null 2>&1; then
-    log "==> WARN: compose invalido o vacio en $(basename "$(dirname "$compose_file")"), se omite"
+  # Capturamos la salida de validacion para reportar la causa real si falla.
+  config_output="$(docker compose -f "$compose_file" config 2>&1)" || {
+    log "==> WARN: compose invalido o incompleto en $stack_name, se omite"
+    while IFS= read -r line; do
+      [[ -n "$line" ]] && log "   - $line"
+    done <<< "$config_output"
     return 0
-  fi
+  }
 
-  log "==> Levantando $(basename "$(dirname "$compose_file")")"
+  log "==> Levantando $stack_name"
   docker compose -f "$compose_file" up -d
 }
 
