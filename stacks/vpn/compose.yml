@@ -1,1 +1,25 @@
-services: 
+services:
+  vpn_server:
+    image: linuxserver/wireguard
+    container_name: vpn_server
+    cap_add:
+      - NET_ADMIN
+    networks:
+      vpn_net:
+        ipv4_address: 172.10.0.10
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      # Aquí se configurarían las variables de peers/usuarios
+    volumes:
+      - ./vpn-config:/config
+    ports:
+      - "51820:51820/udp" # Puerto expuesto al host para clientes externos
+    restart: unless-stopped
+    depends_on:
+      - pfsense-fw
+
+networks:
+  vpn_net:
+    external: true
