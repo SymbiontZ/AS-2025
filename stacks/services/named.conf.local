@@ -1,9 +1,19 @@
-zone "prod.lab" {
+zone "empresa.local" {
     type master;
-    file "/etc/bind/db.prod";
+    file "/etc/bind/zones/db.empresa.local";
 };
 
-zone "dev.lab" {
+zone "0.20.172.in-addr.arpa" {
     type master;
-    file "/etc/bind/db.dev";
+    file "/etc/bind/zones/db.172.20";
+};
+
+zone "0.30.172.in-addr.arpa" {
+type master;
+file "/etc/bind/zones/db.172.30";
+};
+
+zone "0.40.172.in-addr.arpa" {
+type master;
+file "/etc/bind/zones/db.172.40";
 };
