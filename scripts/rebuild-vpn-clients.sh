@@ -10,6 +10,7 @@ VPN_CFG_DIR="$VPN_STACK_DIR/vpn-config"
 WG_CONF="$VPN_CFG_DIR/wg_confs/wg0.conf"
 SERVER_PUBKEY_FILE="$VPN_CFG_DIR/server/publickey-server"
 PROFILES_DIR="$VPN_CFG_DIR/profiles"
+VPN_ENV_FILE="$VPN_STACK_DIR/.env"
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "No se encontro el comando requerido: $1"
@@ -45,12 +46,13 @@ render_profile() {
   local allowed_ips="$5"
   local dns_server="$6"
   local server_pubkey="$7"
+  local endpoint_host="$8"
+  local endpoint_port="$9"
 
   {
     printf '[Interface]\n'
     printf 'Address = %s\n' "$client_ip"
     printf 'PrivateKey = %s\n' "$client_privkey"
-    printf 'ListenPort = 51820\n'
     if [[ -n "$dns_server" ]]; then
       printf 'DNS = %s\n' "$dns_server"
     fi
@@ -58,7 +60,7 @@ render_profile() {
     printf '[Peer]\n'
     printf 'PublicKey = %s\n' "$server_pubkey"
     printf 'PresharedKey = %s\n' "$psk"
-    printf 'Endpoint = vpn.empresa.local:51820\n'
+    printf 'Endpoint = %s:%s\n' "$endpoint_host" "$endpoint_port"
     printf 'AllowedIPs = %s\n' "$allowed_ips"
   } > "$profile_path"
 
@@ -93,6 +95,16 @@ main() {
 
   local server_pubkey
   server_pubkey="$(<"$SERVER_PUBKEY_FILE")"
+  local endpoint_host="vpn.empresa.local"
+  local endpoint_port="51820"
+
+  if [[ -f "$VPN_ENV_FILE" ]]; then
+    # Load endpoint variables from vpn .env when present.
+    # shellcheck disable=SC1090
+    set -a; source "$VPN_ENV_FILE"; set +a
+    endpoint_host="${SERVERURL:-$endpoint_host}"
+    endpoint_port="${SERVERPORT:-$endpoint_port}"
+  fi
 
   local tmp_header
   tmp_header="$(mktemp)"
@@ -119,7 +131,9 @@ main() {
     "$dev_psk" \
     "172.40.0.0/24" \
     "" \
-    "$server_pubkey"
+    "$server_pubkey" \
+    "$endpoint_host" \
+    "$endpoint_port"
 
   render_profile \
     "$PROFILES_DIR/svc_prod_user.conf" \
@@ -128,7 +142,9 @@ main() {
     "$svc_psk" \
     "172.20.0.0/24,172.30.0.0/24" \
     "172.20.0.10" \
-    "$server_pubkey"
+    "$server_pubkey" \
+    "$endpoint_host" \
+    "$endpoint_port"
 
   append_peer_block "dev_user" "$dev_pub" "$dev_psk" "172.10.0.100/32"
   append_peer_block "svc_prod_user" "$svc_pub" "$svc_psk" "172.10.0.101/32"
