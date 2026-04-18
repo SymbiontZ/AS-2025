@@ -1,6 +1,7 @@
 # Env files (no commitear secretos)
 **/.env
 !**/.env.example
+**/rndc.key
 
 # Docker volumes (por si los mapeas a carpetas locales)
 **/*mysql*data*/
