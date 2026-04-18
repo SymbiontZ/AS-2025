@@ -1,0 +1,15 @@
+options {
+    directory "/var/cache/bind";
+    pid-file "/tmp/named.pid";
+    session-keyfile "/tmp/session.key";
+
+    listen-on { any; };
+    listen-on-v6 { none; };
+
+    allow-query { any; };
+
+    recursion no;
+    dnssec-validation no;
+
+    auth-nxdomain no;
+};
