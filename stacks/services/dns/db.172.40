@@ -11,3 +11,4 @@ $TTL 86400
 ; --- Reverse records for 172.40.0.0/24 ---
 10 IN PTR dev-web.empresa.local.
 20 IN PTR dev-mysql.empresa.local.
+30 IN PTR dev-ssh.empresa.local.

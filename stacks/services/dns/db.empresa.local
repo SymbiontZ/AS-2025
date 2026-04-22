@@ -22,4 +22,5 @@ prod-postgres IN A 172.30.0.20
 ; --- Development Network (172.40.0.0/24) ---
 dev-web IN A 172.40.0.10
 dev-mysql IN A 172.40.0.20
+dev-ssh IN A 172.40.0.30
 

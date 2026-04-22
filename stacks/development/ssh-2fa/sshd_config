@@ -1,0 +1,22 @@
+# Basic Hardening
+Port 22
+Protocol 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Authentication
+PermitRootLogin no
+StrictModes yes
+PubkeyAuthentication no
+PasswordAuthentication no
+ChallengeResponseAuthentication yes
+UsePAM yes
+AuthenticationMethods keyboard-interactive
+
+# Authorization
+X11Forwarding no
+PrintMotd no
+
+# Logging
+SyslogFacility AUTH
+LogLevel VERBOSE
