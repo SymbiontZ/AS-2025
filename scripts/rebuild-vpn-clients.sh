@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Imprime mensajes de estado por stderr.
 log() { printf '%s\n' "$*" >&2; }
+# Imprime error y termina la ejecucion.
 die() { log "ERROR: $*"; exit 1; }
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -12,32 +14,38 @@ SERVER_PUBKEY_FILE="$VPN_CFG_DIR/server/publickey-server"
 PROFILES_DIR="$VPN_CFG_DIR/profiles"
 VPN_ENV_FILE="$VPN_STACK_DIR/.env"
 
+# Verifica que un comando exista en el sistema.
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "No se encontro el comando requerido: $1"
 }
 
+# Levanta el contenedor VPN si no esta en ejecucion.
 ensure_vpn_container_running() {
   local running
   running="$(docker inspect -f '{{.State.Running}}' vpn_server 2>/dev/null || true)"
   if [[ "$running" != "true" ]]; then
-    log "==> Arrancando vpn_server"
+    log "==> Iniciando vpn_server"
     docker compose -f "$VPN_STACK_DIR/compose.yml" up -d vpn_server >/dev/null
   fi
 }
 
+# Genera clave privada WireGuard.
 gen_private_key() {
   docker exec vpn_server sh -lc "wg genkey"
 }
 
+# Deriva clave publica desde una privada.
 gen_public_key() {
   local private_key="$1"
   printf '%s' "$private_key" | docker exec -i vpn_server sh -lc "wg pubkey"
 }
 
+# Genera clave precompartida (PSK).
 gen_psk() {
   docker exec vpn_server sh -lc "wg genpsk"
 }
 
+# Escribe el perfil cliente en formato WireGuard.
 render_profile() {
   local profile_path="$1"
   local client_ip="$2"
@@ -67,6 +75,7 @@ render_profile() {
   chmod 600 "$profile_path"
 }
 
+# Agrega un bloque [Peer] al wg0 del servidor.
 append_peer_block() {
   local name="$1"
   local pubkey="$2"
@@ -83,6 +92,7 @@ append_peer_block() {
   } >> "$WG_CONF"
 }
 
+# Orquesta regeneracion de perfiles y peers.
 main() {
   require_cmd docker
 
@@ -99,7 +109,7 @@ main() {
   local endpoint_port="51820"
 
   if [[ -f "$VPN_ENV_FILE" ]]; then
-    # Load endpoint variables from vpn .env when present.
+    # Carga variables de endpoint desde .env si existe.
     # shellcheck disable=SC1090
     set -a; source "$VPN_ENV_FILE"; set +a
     endpoint_host="${SERVERURL:-$endpoint_host}"
@@ -113,6 +123,7 @@ main() {
   cat "$tmp_header" > "$WG_CONF"
   rm -f "$tmp_header"
 
+  # Genera llaves nuevas para cada cliente.
   local dev_priv dev_pub dev_psk
   local svc_priv svc_pub svc_psk
 
@@ -124,6 +135,7 @@ main() {
   svc_pub="$(gen_public_key "$svc_priv")"
   svc_psk="$(gen_psk)"
 
+  # Regenera perfiles cliente con sus rutas permitidas.
   render_profile \
     "$PROFILES_DIR/dev_user.conf" \
     "172.10.0.100" \
@@ -146,6 +158,7 @@ main() {
     "$endpoint_host" \
     "$endpoint_port"
 
+  # Registra peers en el servidor WireGuard.
   append_peer_block "dev_user" "$dev_pub" "$dev_psk" "172.10.0.100/32"
   append_peer_block "svc_prod_user" "$svc_pub" "$svc_psk" "172.10.0.101/32"
 

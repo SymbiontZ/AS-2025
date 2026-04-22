@@ -4,6 +4,20 @@ set -euo pipefail
 log() { printf '%s\n' "$*" >&2; }
 die() { log "ERROR: $*"; exit 1; }
 
+print_header() {
+  log ""
+  log "=============================================="
+  log " Inicializacion de Redes Docker"
+  log "=============================================="
+}
+
+print_row() {
+  local status="$1"
+  local name="$2"
+  local subnet="$3"
+  printf '%-10s | %-18s | %s\n' "$status" "$name" "$subnet" >&2
+}
+
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "No se encontró el comando requerido: $1"
 }
@@ -31,22 +45,33 @@ if [[ ${#NETWORK_SPECS[@]} -eq 0 ]]; then
   NETWORK_SPECS=("${NETWORK_SPECS_DEFAULT[@]}")
 fi
 
+created_count=0
+existing_count=0
+
 create_network_if_missing() {
   local name="$1"
   local subnet="${2:-}"
+  local subnet_show="${subnet:-automatica}"
 
   if docker network inspect "$name" >/dev/null 2>&1; then
-    log "==> Red existe: $name"
+    print_row "EXISTE" "$name" "$subnet_show"
+    ((existing_count+=1))
     return 0
   fi
 
-  log "==> Creando red: $name"
   if [[ -n "$subnet" ]]; then
     docker network create --driver bridge --subnet "$subnet" "$name" >/dev/null
   else
     docker network create --driver bridge "$name" >/dev/null
   fi
+
+  print_row "CREADA" "$name" "$subnet_show"
+  ((created_count+=1))
 }
+
+print_header
+log "Estado     | Red                | Subred"
+log "-----------+--------------------+----------------"
 
 for spec in "${NETWORK_SPECS[@]}"; do
   name="${spec%%:*}"
@@ -61,5 +86,6 @@ for spec in "${NETWORK_SPECS[@]}"; do
   create_network_if_missing "$name" "$subnet"
 done
 
-log "Listo. Redes creadas (o ya existían)."
-log "Haz docker network ls para mirar las redes"
+log "-----------+--------------------+----------------"
+log "Resumen: creadas=$created_count, existentes=$existing_count, total=${#NETWORK_SPECS[@]}"
+log "Listo. Puedes verificar con: docker network ls"
