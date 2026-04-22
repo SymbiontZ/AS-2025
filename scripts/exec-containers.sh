@@ -2,7 +2,12 @@
 set -euo pipefail
 
 log() { printf '%s\n' "$*" >&2; }
-die() { log "ERROR: $*"; exit 1; }
+info() { log "[INFO] $*"; }
+warn() { log "[WARN] $*"; }
+ok() { log "[ OK ] $*"; }
+die() { log "[FAIL] $*"; exit 1; }
+
+hr() { log "------------------------------------------------------------"; }
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -16,15 +21,15 @@ require_cmd docker
 docker compose version >/dev/null 2>&1 || die "No se pudo ejecutar 'docker compose'."
 
 create_networks_if_needed() {
-  local script="$ROOT_DIR/scripts/create-docker-networks.sh"
+  local script="$ROOT_DIR/scripts/create-networks.sh"
   if [[ -x "$script" ]]; then
-    log "==> Verificando/creando redes Docker"
+    info "Verificando/creando redes Docker"
     "$script"
     return
   fi
 
   if [[ -f "$script" ]]; then
-    log "==> Verificando/creando redes Docker"
+    info "Verificando/creando redes Docker"
     bash "$script"
     return
   fi
@@ -39,17 +44,21 @@ up_stack() {
   stack_name="$(basename "$(dirname "$compose_file")")"
   [[ -f "$compose_file" ]] || die "No existe compose: $compose_file"
 
+  hr
+  info "Stack: $stack_name"
+
   # Capturamos la salida de validacion para reportar la causa real si falla.
   config_output="$(docker compose -f "$compose_file" config 2>&1)" || {
-    log "==> WARN: compose invalido o incompleto en $stack_name, se omite"
+    warn "Compose invalido o incompleto en $stack_name; se omite"
     while IFS= read -r line; do
       [[ -n "$line" ]] && log "   - $line"
     done <<< "$config_output"
     return 0
   }
 
-  log "==> Levantando $stack_name"
+  info "Levantando servicios"
   docker compose -f "$compose_file" up -d
+  ok "Stack $stack_name levantado"
 }
 
 is_container_running() {
@@ -61,6 +70,10 @@ is_container_running() {
 }
 
 main() {
+  hr
+  info "Inicio de despliegue de contenedores"
+  hr
+
   create_networks_if_needed
 
   # Orden recomendado: primero firewall/router y luego servicios.
@@ -72,11 +85,13 @@ main() {
   if is_container_running "pfsense-fw"; then
     up_stack "$ROOT_DIR/stacks/vpn/compose.yml"
   else
-    log "==> WARN: pfsense-fw no esta en estado running; se omite stack vpn"
+    hr
+    warn "pfsense-fw no esta en estado running; se omite stack vpn"
   fi
 
-  log ""
-  log "Listo. Estado de contenedores:"
+  hr
+  ok "Despliegue finalizado"
+  info "Estado actual de contenedores:"
   docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Networks}}"
 }
 

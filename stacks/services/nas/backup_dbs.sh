@@ -1,5 +1,5 @@
 #!/bin/bash
-# exec-backup-dbs.sh
+# backup_dbs.sh
 # Intended to be run from inside the NAS container.
 
 # Configuracion
