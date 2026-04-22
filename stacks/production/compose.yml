@@ -26,6 +26,22 @@
         retries: 10
         start_period: 20s
 
+    ftp_proxy:
+      build:
+        context: ./ftp-proxy
+        dockerfile: Dockerfile
+      container_name: prod_ftp_proxy
+      hostname: prod-ftp-proxy
+      ports:
+        - "2121:2121"
+        - "2122:2122"
+      networks:
+        production_net:
+          ipv4_address: 172.30.0.40
+        development_net:
+          ipv4_address: 172.40.0.41
+      restart: always
+
   volumes:
     postgres_data:
 
@@ -33,4 +49,6 @@
     production_net:
       external: true
     services_net:
+      external: true
+    development_net:
       external: true

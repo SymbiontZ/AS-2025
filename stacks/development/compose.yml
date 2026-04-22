@@ -43,6 +43,22 @@ services:
       - ssh_2fa_secrets:/home
     restart: always
 
+  samba_ftp:
+    build:
+      context: ./samba-ftp
+      dockerfile: Dockerfile
+    container_name: dev_samba_ftp
+    hostname: dev-samba-ftp
+    ports:
+      - "21:21"
+      - "139:139"
+      - "445:445"
+      - "2122:2122"
+    networks:
+      development_net:
+        ipv4_address: 172.40.0.40
+    restart: always
+
 volumes:
   mysql_data:
   ssh_2fa_secrets:
