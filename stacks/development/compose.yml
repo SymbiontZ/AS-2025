@@ -27,8 +27,41 @@ services:
       retries: 10
       start_period: 20s
 
+  ssh_2fa:
+    build:
+      context: ./ssh-2fa
+      dockerfile: Dockerfile
+    container_name: dev_ssh_2fa
+    hostname: dev-ssh
+    ports:
+      - "2222:22"
+    networks:
+      development_net:
+        ipv4_address: 172.40.0.30
+    volumes:
+      - ./ssh-2fa/users.conf:/etc/ssh-2fa/users.conf:ro
+      - ssh_2fa_secrets:/home
+    restart: always
+
+  samba_ftp:
+    build:
+      context: ./samba-ftp
+      dockerfile: Dockerfile
+    container_name: dev_samba_ftp
+    hostname: dev-samba-ftp
+    ports:
+      - "21:21"
+      - "139:139"
+      - "445:445"
+      - "2122:2122"
+    networks:
+      development_net:
+        ipv4_address: 172.40.0.40
+    restart: always
+
 volumes:
   mysql_data:
+  ssh_2fa_secrets:
 
 networks:
   development_net:

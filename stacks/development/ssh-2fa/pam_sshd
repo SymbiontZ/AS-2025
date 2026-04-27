@@ -1,0 +1,14 @@
+# PAM configuration for sshd with Google Authenticator
+
+# Standard Unix authentication (password)
+@include common-auth
+
+# Google Authenticator TOTP
+# nullok allows users to login without TOTP if they haven't set it up yet (useful for initial setup/enrollment)
+# We remove nullok so they MUST have a TOTP setup to login, but our entrypoint script sets it up for them.
+auth required pam_google_authenticator.so
+
+# Standard Unix account, session, and password management
+@include common-account
+@include common-session
+@include common-password
