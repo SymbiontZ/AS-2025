@@ -19,6 +19,8 @@ stacks/services/ssh/config/logs/**
 stacks/services/ssh/config/ssh_host_keys/**
 stacks/services/ssh/config/.ssh/authorized_keys
 
+stacks/development/ssh-2fa/users.conf
+
 # Backups created by SSH helper scripts
 stacks/services/ssh/config/.ssh/*.bak.*
 

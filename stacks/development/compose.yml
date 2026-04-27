@@ -34,7 +34,7 @@ services:
     container_name: dev_ssh_2fa
     hostname: dev-ssh
     ports:
-      - "2222:22"
+      - "2223:2222"
     networks:
       development_net:
         ipv4_address: 172.40.0.30
