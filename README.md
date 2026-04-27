@@ -40,3 +40,19 @@ Notas:
 ```bash
 docker compose -f stacks/development/compose.yml up -d
 ```
+
+## Bootstrap de configuracion SSH (antes de levantar servicios)
+
+El servicio `ssh_manager` espera que exista `stacks/services/ssh/config/.ssh/authorized_keys`.
+Si no existe, inicializalo con:
+
+```bash
+chmod +x scripts/init-ssh-config.sh
+./scripts/init-ssh-config.sh
+```
+
+Despues agrega tu clave publica en:
+
+```text
+stacks/services/ssh/config/.ssh/authorized_keys
+```

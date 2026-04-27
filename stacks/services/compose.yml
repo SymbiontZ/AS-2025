@@ -33,7 +33,7 @@ services:
       - ../production/.env
     networks:
       services_net:
-        ipv4_address: 172.20.0.11
+        ipv4_address: 172.20.0.30
     volumes:
       - ./nas/backups:/backups
       - ./nas/backup.conf:/etc/backup.conf
@@ -42,17 +42,30 @@ services:
     restart: always
 
   ssh_manager:
-    build:
-      context: ./ssh
-      dockerfile: Dockerfile
-    container_name: ssh_manager
+    image: linuxserver/openssh-server:latest
+    container_name: service-ssh-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - USER_NAME=admin_user
+      - SUDO_ACCESS=true
+      - PASSWORD_ACCESS=false
+      - PUBLIC_KEY_FILE=/config/.ssh/authorized_keys
+      - LOG_STDOUT=true
     networks:
       services_net:
-        ipv4_address: 172.20.0.12
+        ipv4_address: 172.20.0.40
     volumes:
-      - ./ssh/authorized_keys:/home/admin_user/.ssh/authorized_keys:ro
+      - ./ssh/config:/config
+      - ssh_host_keys:/config/ssh_host_keys
+    ports:
+      - "2222:2222"
     restart: always
 
 networks:
   services_net:
     external: true
+
+volumes:
+  ssh_host_keys:

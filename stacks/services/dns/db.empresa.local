@@ -13,7 +13,8 @@ vpn IN A 172.10.0.10
 
 ; --- Services Network (172.20.0.0/24) ---
 dns IN A 172.20.0.10
-nas IN A 172.20.0.11
+nas IN A 172.20.0.30
+ssh-svc IN A 172.20.0.40
 
 ; --- Production Network (172.30.0.0/24) ---
 prod-web IN A 172.30.0.10

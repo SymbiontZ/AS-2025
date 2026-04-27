@@ -1,14 +1,14 @@
 # Basic Hardening
-Port 22
+Port 2222
 Protocol 2
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
 # Authentication
 PermitRootLogin no
-StrictModes yes
+StrictModes no
 PubkeyAuthentication yes
-AuthorizedKeysFile /etc/ssh/admin_keys
+AuthorizedKeysFile /config/.ssh/authorized_keys
 PasswordAuthentication no
 PermitEmptyPasswords no
 ChallengeResponseAuthentication no

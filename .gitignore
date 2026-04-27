@@ -13,6 +13,15 @@
 
 **/backups/*
 
+# SSH service runtime/generated state
+stacks/services/ssh/config/.bash_history
+stacks/services/ssh/config/logs/**
+stacks/services/ssh/config/ssh_host_keys/**
+stacks/services/ssh/config/.ssh/authorized_keys
+
+# Backups created by SSH helper scripts
+stacks/services/ssh/config/.ssh/*.bak.*
+
 # WireGuard/VPN generated state and secrets
 stacks/vpn/vpn-config/.donoteditthisfile
 stacks/vpn/vpn-config/server/

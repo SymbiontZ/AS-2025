@@ -10,4 +10,5 @@ $TTL 86400
 
 ; --- Reverse records for 172.20.0.0/24 ---
 10 IN PTR dns.empresa.local.
-11 IN PTR nas.empresa.local.
+30 IN PTR nas.empresa.local.
+40 IN PTR ssh-svc.empresa.local.
