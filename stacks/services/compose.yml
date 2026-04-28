@@ -26,7 +26,7 @@ services:
   nas_backups:
     build:
       context: ../../
-      dockerfile: stacks/services/Dockerfile
+      dockerfile: stacks/services/nas/Dockerfile
     container_name: nas_backups
     env_file:
       - ../development/.env
@@ -50,8 +50,6 @@ services:
       - TZ=Etc/UTC
       - USER_NAME=admin_user
       - SUDO_ACCESS=true
-      - PASSWORD_ACCESS=false
-      - PUBLIC_KEY_FILE=/config/.ssh/authorized_keys
       - LOG_STDOUT=true
     networks:
       services_net:

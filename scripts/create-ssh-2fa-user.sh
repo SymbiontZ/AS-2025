@@ -16,7 +16,7 @@ Uso:
   ./scripts/create-ssh-2fa-user.sh <usuario> <password>
 
 Ejemplo:
-  ./scripts/create-ssh-2fa-user.sh fabio "ClaveSegura2026!"
+  ./scripts/create-ssh-2fa-user.sh Developer123 "ClaveSegura2026!"
 
 Que hace:
   1) Agrega usuario:password en stacks/development/ssh-2fa/users.conf.
@@ -101,13 +101,28 @@ wait_container_running() {
 
 verify_user_and_print_secret() {
   local username="$1"
+  local tries=30
 
-  docker exec "$CONTAINER_NAME" sh -lc "getent passwd '$username' >/dev/null" || {
+  while ((tries > 0)); do
+    if docker exec "$CONTAINER_NAME" sh -lc "getent passwd '$username' >/dev/null" >/dev/null 2>&1; then
+      break
+    fi
+    tries=$((tries - 1))
+    sleep 1
+  done
+
+  if ((tries == 0)); then
     die "El usuario '$username' no fue creado dentro del contenedor"
-  }
+  fi
 
   local secret
-  secret="$(docker exec "$CONTAINER_NAME" sh -lc "head -n 1 '/home/$username/.google_authenticator'" 2>/dev/null || true)"
+  tries=30
+  while ((tries > 0)); do
+    secret="$(docker exec "$CONTAINER_NAME" sh -lc "head -n 1 '/home/$username/.google_authenticator'" 2>/dev/null || true)"
+    [[ -n "$secret" ]] && break
+    tries=$((tries - 1))
+    sleep 1
+  done
   [[ -n "$secret" ]] || die "No se encontro el secreto TOTP para '$username'"
 
   log "Cuenta creada correctamente"

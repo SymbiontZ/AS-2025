@@ -5,16 +5,23 @@ HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
 # Authentication
-PermitRootLogin no
+
+## Impide login directo como root — usar cuentas de usuario con sudo.
+PermitRootLogin no 
 StrictModes no
+## Habilita autenticación por clave pública.
 PubkeyAuthentication yes
+## Archivo donde buscar las claves autorizadas (aquí montado en /config para persistencia).
 AuthorizedKeysFile /config/.ssh/authorized_keys
+## Deshabilita autenticación por contraseña; usar sólo claves públicas.
 PasswordAuthentication no
+## Asegura que cuentas sin contraseña no puedan autenticarse.
 PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 UsePAM no
 
 # Authorization
+## Restringe el acceso SSH a usuarios listados (ej. 'admin_user').
 AllowUsers admin_user
 X11Forwarding no
 PrintMotd no
