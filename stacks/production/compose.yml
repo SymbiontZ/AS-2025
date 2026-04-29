@@ -34,7 +34,7 @@
       hostname: prod-ftp-proxy
       ports:
         - "2121:2121"
-        - "2122:2122"
+        - "2122-2130:2122-2130"
       networks:
         production_net:
           ipv4_address: 172.30.0.40

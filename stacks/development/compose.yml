@@ -52,7 +52,7 @@ services:
     ports:
       - "21:21"
       - "139:139"
-      - "445:445"
+      - "446:445" #Ante posible error de mapeado por conflicto
       - "2122:2122"
     networks:
       development_net:
