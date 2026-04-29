@@ -10,6 +10,6 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
-EXPOSE 21 139 445 2122
+EXPOSE 21 139 445 2132 2133
 
 CMD ["/entrypoint.sh"]

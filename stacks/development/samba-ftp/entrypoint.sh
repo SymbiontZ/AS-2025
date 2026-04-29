@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # Create ftp group and user if they don't exist
 groupadd -f ftp
@@ -45,4 +46,4 @@ chown root:root /var/run/vsftpd/empty
 /usr/sbin/vsftpd /etc/vsftpd.conf &
 
 # Start samba
-exec smbd -F -S
+smbd -F
