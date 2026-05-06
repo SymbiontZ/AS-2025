@@ -42,6 +42,19 @@
           ipv4_address: 172.40.0.41
       restart: always
 
+    nginx_server:
+      image: nginx:latest
+      container_name: nginx_server
+      ports:
+        - "80:80"
+        - "443:443"
+      networks:
+        production_net:
+          ipv4_address: 172.30.0.10
+      volumes:
+        - ./nginx/conf:/etc/nginx/conf.d:ro
+      restart: always
+
   volumes:
     postgres_data:
 
