@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica - Servidor Web</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .logo span {
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+        .members {
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+        }
+        .link-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 10px 25px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+        }
+        .link-btn:hover {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Práctica - Servidor Web</h1>
+    </header>
+
+    <div class="container">
+        <div class="logo">
+            <span>Tech</span>Solutions
+        </div>
+        <p>Bienvenido al sitio público de TechSolutions.</p>
+
+        <div class="members">
+            <h3>Miembros del Grupo:</h3>
+            <p>Mario (Tú)</p>
+            <!-- Puedes añadir más nombres aquí -->
+        </div>
+
+        <a href="/publico/" class="link-btn">Acceso al Servidor FTP (Carpeta Pública)</a>
+    </div>
+
+</body>
+</html>
