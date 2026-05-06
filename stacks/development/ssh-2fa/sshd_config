@@ -20,3 +20,4 @@ PrintMotd no
 # Logging
 SyslogFacility AUTH
 LogLevel VERBOSE
+AllowTcpForwarding yes
