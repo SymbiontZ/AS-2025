@@ -41,6 +41,8 @@ services:
     volumes:
       - ./ssh-2fa/users.conf:/etc/ssh-2fa/users.conf:ro
       - ssh_2fa_secrets:/home
+    dns:
+      - 172.20.0.10
     restart: always
 
   samba_ftp:
@@ -58,11 +60,33 @@ services:
     networks:
       development_net:
         ipv4_address: 172.40.0.40
+    volumes:
+      - publico_data:/data/publico
+    restart: always
+
+  apache_web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: dev_apache_web
+    hostname: dev-apache-web
+    ports:
+      - "80:80"
+    networks:
+      development_net:
+        ipv4_address: 172.40.0.10
+    volumes:
+      - publico_data:/var/www/ftp_publico:ro
+      - ./web/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:ro
+      - ./web/.htpasswd:/usr/local/apache2/conf/.htpasswd:ro
+      - ./web/www:/var/www/www:ro
+      - ./web/intranet:/var/www/intranet:ro
     restart: always
 
 volumes:
   mysql_data:
   ssh_2fa_secrets:
+  publico_data:
 
 networks:
   development_net:
