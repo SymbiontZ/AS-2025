@@ -52,23 +52,23 @@
 # NGINX PROXY -> APACHE
 ############################
 
-# Permitir HTTP/HTTPS desde proxy (172.30.0.10) a apache (172.40.0.10)
--A FORWARD -p tcp -s 172.30.0.10 -d 172.40.0.10 --dport 80 -j ACCEPT
--A FORWARD -p tcp -s 172.30.0.10 -d 172.40.0.10 --dport 443 -j ACCEPT
+# Permitir HTTP/HTTPS desde proxy (172.30.0.12) a apache (172.40.0.10)
+-A FORWARD -p tcp -s 172.30.0.12 -d 172.40.0.10 --dport 80 -j ACCEPT
+-A FORWARD -p tcp -s 172.30.0.12 -d 172.40.0.10 --dport 443 -j ACCEPT
 
 ############################
 # NGINX (SOLO VPN O MISMA SUBRED)
 ############################
 
 # Permitir acceso HTTP/HTTPS al nginx desde VPN y produccion
--A FORWARD -p tcp -s 172.10.0.0/24 -d 172.30.0.10 --dport 80 -j ACCEPT
--A FORWARD -p tcp -s 172.10.0.0/24 -d 172.30.0.10 --dport 443 -j ACCEPT
--A FORWARD -p tcp -s 172.30.0.0/24 -d 172.30.0.10 --dport 80 -j ACCEPT
--A FORWARD -p tcp -s 172.30.0.0/24 -d 172.30.0.10 --dport 443 -j ACCEPT
+-A FORWARD -p tcp -s 172.10.0.0/24 -d 172.30.0.12 --dport 80 -j ACCEPT
+-A FORWARD -p tcp -s 172.10.0.0/24 -d 172.30.0.12 --dport 443 -j ACCEPT
+-A FORWARD -p tcp -s 172.30.0.0/24 -d 172.30.0.12 --dport 80 -j ACCEPT
+-A FORWARD -p tcp -s 172.30.0.0/24 -d 172.30.0.12 --dport 443 -j ACCEPT
 
 # Bloquear HTTP/HTTPS al nginx desde otras redes
--A FORWARD -p tcp -d 172.30.0.10 --dport 80 -j DROP
--A FORWARD -p tcp -d 172.30.0.10 --dport 443 -j DROP
+-A FORWARD -p tcp -d 172.30.0.12 --dport 80 -j DROP
+-A FORWARD -p tcp -d 172.30.0.12 --dport 443 -j DROP
 
 ############################
 # ACCESO FTP
@@ -113,5 +113,9 @@ COMMIT
 -A POSTROUTING -s 172.20.0.0/24 -j MASQUERADE
 -A POSTROUTING -s 172.30.0.0/24 -j MASQUERADE
 -A POSTROUTING -s 172.40.0.0/24 -j MASQUERADE
+
+# VPN -> intranet DNS (172.30.0.10) hacia nginx real (172.30.0.12)
+-A PREROUTING -i wg0 -p tcp -d 172.30.0.10 --dport 80 -j DNAT --to-destination 172.30.0.12:80
+-A PREROUTING -i wg0 -p tcp -d 172.30.0.10 --dport 443 -j DNAT --to-destination 172.30.0.12:443
 
 COMMIT
