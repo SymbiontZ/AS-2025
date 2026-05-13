@@ -70,6 +70,9 @@ services:
       dockerfile: Dockerfile
     container_name: dev_apache_web
     hostname: dev-apache-web
+    cap_add:
+      - NET_ADMIN
+    command: ["/bin/sh", "-c", "ip route add 172.30.0.0/24 via 172.40.0.2 || true; exec httpd-foreground"]
     ports:
       - "80:80"
     networks:

@@ -1,6 +1,6 @@
 $TTL 86400
 @ IN SOA dns.empresa.local. admin.empresa.local. (
-        5               ; Serial
+        7               ; Serial
         604800          ; Refresh
         86400           ; Retry
         694800          ; Expire
@@ -25,5 +25,5 @@ dev-mysql IN A 172.40.0.20
 dev-ssh IN A 172.40.0.30
 
 www IN A 172.40.0.10
-intranet IN A 172.40.0.10
+intranet IN A 172.30.0.12
 
