@@ -1,19 +1,21 @@
 $TTL 86400
 @ IN SOA dns.empresa.local. admin.empresa.local. (
-        5               ; Serial
+        7               ; Serial
         604800          ; Refresh
         86400           ; Retry
         694800          ; Expire
         86400 )         ; TTL mínimo
 
-@ IN NS dns.empresa.local.
+@ IN NS  dns.empresa.local.
+@ IN MX  10 mail.empresa.local.
 
 ; --- VPN Network (172.10.0.10/24) ---
 vpn IN A 172.10.0.10
 
 ; --- Services Network (172.20.0.0/24) ---
-dns IN A 172.20.0.10
-nas IN A 172.20.0.30
+dns     IN A 172.20.0.10
+mail    IN A 172.20.0.50
+nas     IN A 172.20.0.30
 ssh-svc IN A 172.20.0.40
 
 ; --- Production Network (172.30.0.0/24) ---

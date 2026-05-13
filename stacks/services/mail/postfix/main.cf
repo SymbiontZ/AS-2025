@@ -1,0 +1,34 @@
+# ─── Identidad del servidor ───────────────────────────────────────────────────
+myhostname = mail.empresa.local
+mydomain   = empresa.local
+myorigin   = $mydomain
+
+# ─── Redes e interfaces ───────────────────────────────────────────────────────
+inet_interfaces = all
+inet_protocols  = ipv4
+
+# ─── Dominios locales ─────────────────────────────────────────────────────────
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+
+# ─── Relay: SÓLO red interna (anti-relay abierto) ─────────────────────────────
+mynetworks = 127.0.0.0/8, 172.20.0.0/24
+relayhost  =
+
+# Rechazar relay para orígenes externos
+smtpd_relay_restrictions =
+    permit_mynetworks,
+    reject_unauth_destination
+
+# ─── Formato de buzones (Maildir, compatible con Dovecot) ─────────────────────
+home_mailbox = Maildir/
+
+# ─── TLS (deshabilitado en entorno de laboratorio) ────────────────────────────
+smtpd_use_tls = no
+
+# ─── Logs detallados ─────────────────────────────────────────────────────────
+debug_peer_level   = 0
+smtp_tls_loglevel  = 0
+
+# ─── Límites ─────────────────────────────────────────────────────────────────
+message_size_limit  = 10240000
+mailbox_size_limit  = 51200000

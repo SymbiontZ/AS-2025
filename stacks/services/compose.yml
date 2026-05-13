@@ -61,6 +61,20 @@ services:
       - "2222:2222"
     restart: always
 
+  mail_server:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    container_name: mail_server
+    hostname: mail.empresa.local
+    networks:
+      services_net:
+        ipv4_address: 172.20.0.50
+    ports:
+      - "25:25"
+      - "143:143"
+    restart: always
+
 networks:
   services_net:
     external: true

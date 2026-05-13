@@ -1,6 +1,6 @@
 $TTL 86400
 @ IN SOA dns.empresa.local. admin.empresa.local. (
-        1               ; Serial
+        3               ; Serial
         604800          ; Refresh
         86400           ; Retry
         694800          ; Expire
@@ -10,5 +10,6 @@ $TTL 86400
 
 ; --- Reverse records for 172.20.0.0/24 ---
 10 IN PTR dns.empresa.local.
+20 IN PTR mail.empresa.local.
 30 IN PTR nas.empresa.local.
 40 IN PTR ssh-svc.empresa.local.
