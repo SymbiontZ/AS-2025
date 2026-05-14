@@ -22,11 +22,15 @@ smtpd_relay_restrictions =
 # ─── Formato de buzones (Maildir, compatible con Dovecot) ─────────────────────
 home_mailbox = Maildir/
 
-# ─── TLS (deshabilitado en entorno de laboratorio) ────────────────────────────
-smtpd_use_tls = no
+# ─── TLS (habilitado STARTTLS) ────────────────────────────────────────────────
+smtpd_use_tls = yes
+smtpd_tls_cert_file = /etc/ssl/certs/mail.crt
+smtpd_tls_key_file = /etc/ssl/private/mail.key
+smtpd_tls_security_level = may
+smtp_tls_security_level = may
 
 # ─── Logs detallados ─────────────────────────────────────────────────────────
-debug_peer_level   = 0
+debug_peer_level   = 2
 smtp_tls_loglevel  = 0
 
 # ─── Límites ─────────────────────────────────────────────────────────────────
