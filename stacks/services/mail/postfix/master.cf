@@ -4,7 +4,7 @@
 #
 
 # ─── SMTP (port 25) ───────────────────────────────────────────────────────────
-smtp      inet  n       -       y       -       -       smtpd
+smtp      inet  n       -       n       -       -       smtpd
 
 # ─── Servicios internos de Postfix ───────────────────────────────────────────
 pickup    unix  n       -       y       60      1       pickup

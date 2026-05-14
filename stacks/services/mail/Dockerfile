@@ -22,6 +22,12 @@ COPY dovecot/10-auth.conf  /etc/dovecot/conf.d/10-auth.conf
 COPY dovecot/10-mail.conf  /etc/dovecot/conf.d/10-mail.conf
 COPY dovecot/10-master.conf /etc/dovecot/conf.d/10-master.conf
 COPY dovecot/15-mailboxes.conf /etc/dovecot/conf.d/15-mailboxes.conf
+COPY dovecot/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf
+
+# Copy SSL certificates
+COPY ssl/mail.crt /etc/ssl/certs/mail.crt
+COPY ssl/mail.key /etc/ssl/private/mail.key
+RUN chmod 600 /etc/ssl/private/mail.key
 
 # Entrypoint script
 COPY entrypoint.sh /entrypoint.sh
