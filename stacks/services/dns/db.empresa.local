@@ -7,7 +7,7 @@ $TTL 86400
         86400 )         ; TTL mínimo
 
 @ IN NS  dns.empresa.local.
-@ IN MX  10 mail.empresa.local.
+@ IN MX  10 mail.empresa.local.         ; MX(Mail Exchanger)
 
 ; --- VPN Network (172.10.0.10/24) ---
 vpn IN A 172.10.0.10

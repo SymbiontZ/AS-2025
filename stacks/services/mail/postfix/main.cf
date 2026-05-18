@@ -9,6 +9,8 @@ inet_protocols  = ipv4
 
 # ─── Dominios locales ─────────────────────────────────────────────────────────
 mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
 
 # ─── Relay: SÓLO red interna (anti-relay abierto) ─────────────────────────────
 mynetworks = 127.0.0.0/8, 172.20.0.0/24
@@ -26,7 +28,7 @@ home_mailbox = Maildir/
 smtpd_use_tls = no
 
 # ─── Logs detallados ─────────────────────────────────────────────────────────
-debug_peer_level   = 0
+debug_peer_level   = 1
 smtp_tls_loglevel  = 0
 
 # ─── Límites ─────────────────────────────────────────────────────────────────

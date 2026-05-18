@@ -5,7 +5,7 @@
 | Parámetro | Valor |
 |-----------|-------|
 | Dominio de correo | `empresa.local` |
-| IP del servidor de correo | `172.20.0.20` |
+| IP del servidor de correo | `172.20.0.50` |
 | Protocolo envío | SMTP — puerto **25** |
 | Protocolo recepción | IMAP — puerto **143** |
 | Usuarios de prueba | `alice`, `bob`, `carlos` |
@@ -54,7 +54,7 @@ El servidor DNS interno debe resolver tanto el nombre del servidor como el regis
 dig @172.20.0.10 mail.empresa.local A
 ```
 
-**Resultado esperado:** `mail.empresa.local. 86400 IN A 172.20.0.20`
+**Resultado esperado:** `mail.empresa.local. 86400 IN A 172.20.0.50`
 
 ### 1.2 Resolver el registro MX del dominio
 
@@ -67,10 +67,10 @@ dig @172.20.0.10 empresa.local MX
 ### 1.3 Resolución inversa (PTR)
 
 ```bash
-dig @172.20.0.10 -x 172.20.0.20
+dig @172.20.0.10 -x 172.20.0.50
 ```
 
-**Resultado esperado:** `20.0.20.172.in-addr.arpa. 86400 IN PTR mail.empresa.local.`
+**Resultado esperado:** `50.0.20.172.in-addr.arpa. 86400 IN PTR mail.empresa.local.`
 
 > [!NOTE]
 > Si el DNS server no está corriendo, reinícialo primero:
@@ -118,10 +118,10 @@ exit
 docker exec -it mail_server bash
 
 # Enviar un correo de alice a bob
-echo "Hola Bob, soy Alice. Esto es una prueba." \
-  | mail -s "Prueba desde Alice" \
-         -r "alice@empresa.local" \
-         bob@empresa.local
+echo "Hola Carlos, como te trata la vida?." \
+  | mail -s "Prueba mail Fabio" \
+         -r "fabio@empresa.local" \
+         carlos@empresa.local
 
 # Enviar correo de bob a carlos
 echo "Hola Carlos, mensaje de Bob." \
@@ -140,7 +140,7 @@ docker exec -it mail_server bash
 swaks \
   --to bob@empresa.local \
   --from alice@empresa.local \
-  --server 172.20.0.20 \
+  --server 172.20.0.50 \
   --port 25 \
   --header "Subject: Test SMTP con swaks" \
   --body "Mensaje de prueba enviado con swaks."
@@ -152,7 +152,7 @@ swaks \
 
 ```bash
 docker exec -it mail_server bash
-telnet 172.20.0.20 25
+telnet 172.20.0.50 25
 ```
 
 Diálogo SMTP completo:
@@ -193,7 +193,7 @@ docker exec mail_server cat /home/bob/Maildir/new/<nombre_fichero>
 El protocolo IMAP requiere un **tag** al inicio de cada comando (`a1`, `a2`, …).
 
 ```bash
-telnet 172.20.0.20 143
+telnet 172.20.0.50 143
 ```
 
 Sesión IMAP completa:
@@ -297,7 +297,7 @@ docker exec -it mail_server bash
 swaks \
   --to alice@empresa.local \
   --from bob@empresa.local \
-  --server 172.20.0.20 \
+  --server 172.20.0.50 \
   --port 25
 ```
 
@@ -311,7 +311,7 @@ docker exec -it mail_server bash
 swaks \
   --to test@gmail.com \
   --from alice@empresa.local \
-  --server 172.20.0.20 \
+  --server 172.20.0.50 \
   --port 25
 ```
 
@@ -340,15 +340,15 @@ swaks \
 
 | # | Verificación | Comando clave | Resultado esperado |
 |---|---|---|---|
-| 1 | DNS — Registro A | `dig @172.20.0.10 mail.empresa.local A` | `172.20.0.20` |
+| 1 | DNS — Registro A | `dig @172.20.0.10 mail.empresa.local A` | `172.20.0.50` |
 | 2 | DNS — Registro MX | `dig @172.20.0.10 empresa.local MX` | `10 mail.empresa.local.` |
-| 3 | DNS — Registro PTR | `dig @172.20.0.10 -x 172.20.0.20` | `mail.empresa.local.` |
+| 3 | DNS — Registro PTR | `dig @172.20.0.10 -x 172.20.0.50` | `mail.empresa.local.` |
 | 4 | Usuarios creados | `docker exec mail_server getent passwd alice` | Línea con datos del usuario |
-| 5 | SMTP interno OK | `swaks --to bob@empresa.local --server 172.20.0.20` | `250 Ok: queued` |
+| 5 | SMTP interno OK | `swaks --to bob@empresa.local --server 172.20.0.50` | `250 Ok: queued` |
 | 6 | IMAP login OK | Telnet 143 → `LOGIN alice Alice123!` | `a1 OK Logged in` |
 | 7 | Mensaje recibido | `ls /home/bob/Maildir/new/` | Fichero con el correo |
 | 8 | Log entrega | `grep "status=sent" /var/log/mail.log` | Línea con la entrega |
-| 9 | Anti-relay externo | `swaks --to test@gmail.com --server 172.20.0.20` | `554 Relay access denied` |
+| 9 | Anti-relay externo | `swaks --to test@gmail.com --server 172.20.0.50` | `554 Relay access denied` |
 | 10 | Anti-relay origen | `swaks --from hacker@externo.com --server localhost` | `554 Relay access denied` |
 
 ---
@@ -357,7 +357,7 @@ swaks \
 
 ```
 stacks/services/
-├── compose.yml                   ← Añadido: servicio mail_server (172.20.0.20)
+├── compose.yml                   ← Añadido: servicio mail_server (172.20.0.50)
 └── mail/
     ├── Dockerfile                ← Ubuntu 22.04 + Postfix + Dovecot
     ├── entrypoint.sh             ← Crea usuarios, inicia servicios

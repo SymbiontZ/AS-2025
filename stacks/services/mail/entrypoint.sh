@@ -26,6 +26,9 @@ done
 # ─── 2. Configurar Postfix ────────────────────────────────────────────────────
 echo "==> [entrypoint] Iniciando Postfix..."
 
+# Asegurar que la base de aliases existe y esta sincronizada.
+newaliases
+
 # Asegurar que /var/spool/postfix tiene la estructura correcta
 postfix check 2>/dev/null || true
 
