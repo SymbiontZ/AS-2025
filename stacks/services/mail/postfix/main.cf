@@ -16,9 +16,16 @@ alias_database = hash:/etc/aliases
 mynetworks = 127.0.0.0/8, 172.20.0.0/24
 relayhost  =
 
-# Rechazar relay para orígenes externos
+# Autenticación SASL mediante Dovecot
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_security_options = noanonymous
+
+# Rechazar relay para orígenes externos, pero permitir autenticados
 smtpd_relay_restrictions =
     permit_mynetworks,
+    permit_sasl_authenticated,
     reject_unauth_destination
 
 # ─── Formato de buzones (Maildir, compatible con Dovecot) ─────────────────────
