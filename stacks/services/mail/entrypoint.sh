@@ -3,6 +3,13 @@ set -e
 
 echo "==> [entrypoint] Configurando servidor de correo empresa.local..."
 
+# Postfix escribe sus eventos en syslog. En Docker hay que arrancar rsyslog
+# dentro del contenedor para que se cree /var/log/mail.log.
+touch /var/log/mail.log
+chown syslog:adm /var/log/mail.log
+chmod 640 /var/log/mail.log
+rsyslogd
+
 # ─── 1. Crear usuarios del sistema ───────────────────────────────────────────
 declare -A USUARIOS=(
   ["alice"]="Alice123!"

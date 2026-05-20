@@ -285,7 +285,7 @@ docker exec mail_server postconf smtpd_relay_restrictions
 
 **Resultado esperado:**
 ```
-mynetworks = 127.0.0.0/8, 172.20.0.0/24
+mynetworks = 127.0.0.0/8
 smtpd_relay_restrictions = permit_mynetworks, reject_unauth_destination
 ```
 
@@ -317,13 +317,13 @@ swaks \
 
 **Resultado esperado:** `554 5.7.1 Relay access denied`
 
-### 6.4 Prueba de relay desde IP externa (debe ser rechazado) ✅
+### 6.4 Prueba de relay desde el host hacia dominio externo (debe ser rechazado) ✅
 
 Desde el **host** (fuera de la red `172.20.0.0/24`), con el puerto 25 expuesto:
 
 ```bash
 swaks \
-  --to bob@empresa.local \
+  --to test@gmail.com \
   --from hacker@externo.com \
   --server localhost \
   --port 25
@@ -332,7 +332,7 @@ swaks \
 **Resultado esperado:** `554 5.7.1 Relay access denied`
 
 > [!CAUTION]
-> Si el servidor responde `250 Ok` a las pruebas 6.3 o 6.4, el servidor ES un relay abierto. Debe corregirse revisando `mynetworks` y `smtpd_relay_restrictions` en `/etc/postfix/main.cf`.
+> Si el servidor responde `250 Ok` a las pruebas 6.3 o 6.4, el servidor permite relay hacia dominios externos. Debe corregirse revisando `mynetworks` y `smtpd_relay_restrictions` en `/etc/postfix/main.cf`.
 
 ---
 
@@ -349,7 +349,7 @@ swaks \
 | 7 | Mensaje recibido | `ls /home/bob/Maildir/new/` | Fichero con el correo |
 | 8 | Log entrega | `grep "status=sent" /var/log/mail.log` | Línea con la entrega |
 | 9 | Anti-relay externo | `swaks --to test@gmail.com --server 172.20.0.50` | `554 Relay access denied` |
-| 10 | Anti-relay origen | `swaks --from hacker@externo.com --server localhost` | `554 Relay access denied` |
+| 10 | Anti-relay desde host | `swaks --to test@gmail.com --from hacker@externo.com --server localhost` | `554 Relay access denied` |
 
 ---
 
